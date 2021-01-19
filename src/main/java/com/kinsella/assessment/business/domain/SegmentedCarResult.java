@@ -1,5 +1,8 @@
 package com.kinsella.assessment.business.domain;
 
+import com.kinsella.assessment.data.persistence.entity.CarResult;
+
+import java.util.Objects;
 import java.util.StringJoiner;
 
 public class SegmentedCarResult {
@@ -55,5 +58,25 @@ public class SegmentedCarResult {
         StringJoiner joiner = new StringJoiner(" : ");
         joiner.add(supplierName).add(description).add(sippCode).add(rentalCost +"").add(fuelPolicy.toString());
         return joiner.toString();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        SegmentedCarResult carResult = (SegmentedCarResult) obj;
+        return Objects.equals(this.getDescription(), carResult.getDescription())
+                && Objects.equals(this.getSupplierName(), carResult.getSupplierName())
+                && Objects.equals(this.getSippCode(), carResult.getSippCode())
+                && Objects.equals(this.getFuelPolicy(), carResult.getFuelPolicy());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(description,supplierName,sippCode,fuelPolicy);
     }
 }
