@@ -1,5 +1,5 @@
 # Cars Application
-Console application which allows a user to perform CRUD operations on persons and their addresses.
+
 
 ## Prerequisites
 
