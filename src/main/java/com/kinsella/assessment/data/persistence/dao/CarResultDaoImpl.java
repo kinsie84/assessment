@@ -9,15 +9,18 @@ import java.util.HashSet;
 @Component
 public class CarResultDaoImpl implements CarResultDao{
 
+    private Collection<CarResult> carResults;
+
     @Override
     public Iterable<CarResult> findAll() {
-
-        return generateCarResultRecords();
-
+        if (carResults == null){
+            return generateCarResultRecords();
+        }
+        return carResults;
     }
 
     private Collection<CarResult> generateCarResultRecords(){
-        Collection<CarResult> carResults = new HashSet<>();
+        this.carResults = new HashSet<>();
 
         carResults.add(new CarResult("Volkswagen Polo", "NIZA", "EDMR", 12.81d, "FULLEMPTY"));
         carResults.add(new CarResult("Ford C-Max Diesel", "NIZA", "CMMD", 22.04d, "FULLEMPTY"));
