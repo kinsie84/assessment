@@ -66,8 +66,8 @@ public class CarResultServiceImpl implements CarResultService{
     @Override
     public Collection<SegmentedCarResult> removeResultsAboveMedian(Collection<SegmentedCarResult> segmentedCarResults, FuelPolicy fuelPolicy) {
 
-        Collection<SegmentedCarResult> corporateList = filterListByGroup(true, segmentedCarResults);
-        Collection<SegmentedCarResult> nonCorporateList = filterListByGroup(false, segmentedCarResults);
+        Collection<SegmentedCarResult> corporateList = filterListByGroup( segmentedCarResults, true);
+        Collection<SegmentedCarResult> nonCorporateList = filterListByGroup( segmentedCarResults, false);
 
         double corporateMedian = getMedianPrice((List<SegmentedCarResult>) corporateList);
         double nonCorporateMedian = getMedianPrice((List<SegmentedCarResult>) nonCorporateList);
@@ -95,7 +95,7 @@ public class CarResultServiceImpl implements CarResultService{
         return Math.floor(median * 100) / 100;
     }
 
-    private Collection<SegmentedCarResult> filterListByGroup(boolean corporate, Collection<SegmentedCarResult> segmentedCarResults) {
+    private Collection<SegmentedCarResult> filterListByGroup(Collection<SegmentedCarResult> segmentedCarResults, boolean corporate) {
 
         return segmentedCarResults.stream()
                 .filter((c) -> c.isCorporate() == corporate)
