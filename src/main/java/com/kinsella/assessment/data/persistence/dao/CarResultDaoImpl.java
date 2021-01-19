@@ -3,16 +3,21 @@ package com.kinsella.assessment.data.persistence.dao;
 import com.kinsella.assessment.data.persistence.entity.CarResult;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 
 @Component
 public class CarResultDaoImpl implements CarResultDao{
 
     @Override
-    public Collection<CarResult> getAll() {
+    public Iterable<CarResult> findAll() {
 
-        Collection<CarResult> carResults = new ArrayList<>();
+        return generateCarResultRecords();
+
+    }
+
+    private Collection<CarResult> generateCarResultRecords(){
+        Collection<CarResult> carResults = new HashSet<>();
 
         carResults.add(new CarResult("Volkswagen Polo", "NIZA", "EDMR", 12.81d, "FULLEMPTY"));
         carResults.add(new CarResult("Ford C-Max Diesel", "NIZA", "CMMD", 22.04d, "FULLEMPTY"));
@@ -325,6 +330,5 @@ public class CarResultDaoImpl implements CarResultDao{
         carResults.add(new CarResult("Citroen C1", "FLIZZR", "MBMR", 49.08d, "FULLFULL"));
 
         return carResults;
-
     }
 }

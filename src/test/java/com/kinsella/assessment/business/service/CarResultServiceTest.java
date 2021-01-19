@@ -48,7 +48,7 @@ public class CarResultServiceTest {
 
     @Before
     public void setUp() {
-        Mockito.when(carResultRepository.getAll())
+        Mockito.when(carResultRepository.findAll())
                 .thenReturn(null);
     }
 

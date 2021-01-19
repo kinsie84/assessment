@@ -1,5 +1,7 @@
 package com.kinsella.assessment.data.persistence.entity;
 
+import java.util.Objects;
+
 public class CarResult {
     private final String description;
     private final String supplierName;
@@ -41,5 +43,25 @@ public class CarResult {
                 this.sippCode + " : " +
                 this.rentalCost + " : " +
                 this.fuelPolicy;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
+        CarResult carResult = (CarResult) obj;
+        return Objects.equals(this.getDescription(), carResult.getDescription())
+                && Objects.equals(this.getSupplierName(), carResult.getSupplierName())
+                && Objects.equals(this.getSippCode(), carResult.getSippCode())
+                && Objects.equals(this.getFuelPolicy(), carResult.getFuelPolicy());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(description,supplierName,sippCode,fuelPolicy);
     }
 }

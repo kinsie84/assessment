@@ -28,14 +28,19 @@ public class CarResultServiceImpl implements CarResultService{
     @Autowired
     private SegmentedCarResultAssembler segmentedCarResultAssembler;
 
-    private Collection<CarResult> getAllDistinct() {
-        return carResultRepository.getAllUnique();
+    private Collection<CarResult> getAll() {
+
+        Collection<CarResult> carResultsList = new ArrayList<>();
+        Iterable<CarResult> carResultsIterable = carResultRepository.findAll();
+        carResultsIterable.iterator().forEachRemaining(carResultsList::add);
+
+        return carResultsList;
     }
 
     @Override
     public Collection<SegmentedCarResult> getSegmentedCarResults() {
 
-        Collection<CarResult> carResults = getAllDistinct();
+        Collection<CarResult> carResults = getAll();
         Collection<SegmentedCarResult> segmentedList = new ArrayList<>();
         carResults.forEach(carResult -> {
             try {
