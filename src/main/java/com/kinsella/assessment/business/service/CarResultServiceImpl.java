@@ -64,7 +64,7 @@ public class CarResultServiceImpl implements CarResultService{
     }
 
     @Override
-    public Collection<SegmentedCarResult> removeResultsAboveMedian(Collection<SegmentedCarResult> segmentedCarResults) {
+    public Collection<SegmentedCarResult> removeResultsAboveMedian(Collection<SegmentedCarResult> segmentedCarResults, FuelPolicy fuelPolicy) {
 
         Collection<SegmentedCarResult> corporateList = filterListByGroup(true, segmentedCarResults);
         Collection<SegmentedCarResult> nonCorporateList = filterListByGroup(false, segmentedCarResults);
@@ -72,8 +72,8 @@ public class CarResultServiceImpl implements CarResultService{
         double corporateMedian = getMedianPrice((List<SegmentedCarResult>) corporateList);
         double nonCorporateMedian = getMedianPrice((List<SegmentedCarResult>) nonCorporateList);
 
-        corporateList.removeIf(c -> c.getFuelPolicy() == FuelPolicy.FULLFULL && c.getRentalCost() > corporateMedian);
-        nonCorporateList.removeIf(c -> c.getFuelPolicy() == FuelPolicy.FULLFULL && c.getRentalCost() > nonCorporateMedian);
+        corporateList.removeIf(c -> c.getFuelPolicy() == fuelPolicy && c.getRentalCost() > corporateMedian);
+        nonCorporateList.removeIf(c -> c.getFuelPolicy() == fuelPolicy && c.getRentalCost() > nonCorporateMedian);
 
         return Stream.of(corporateList, nonCorporateList).flatMap(Collection::stream).collect(Collectors.toList());
     }

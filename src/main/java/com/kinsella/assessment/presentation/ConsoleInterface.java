@@ -1,5 +1,6 @@
 package com.kinsella.assessment.presentation;
 
+import com.kinsella.assessment.business.domain.FuelPolicy;
 import com.kinsella.assessment.business.domain.SegmentedCarResult;
 import com.kinsella.assessment.business.service.CarResultService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +27,7 @@ public class ConsoleInterface implements CommandLineRunner {
         System.out.println();
 
         Collection<SegmentedCarResult> segmentedCarResults = carResultService.getSegmentedCarResults();
-        Collection<SegmentedCarResult> filteredSegmentedCarResults = carResultService.removeResultsAboveMedian(segmentedCarResults);
+        Collection<SegmentedCarResult> filteredSegmentedCarResults = carResultService.removeResultsAboveMedian(segmentedCarResults, FuelPolicy.FULLFULL);
         Collection<SegmentedCarResult> sortedSegmentedCarResults = carResultService.sortByCorporateCategoryPrice(filteredSegmentedCarResults);
         sortedSegmentedCarResults.forEach(System.out::println);
 

@@ -1,6 +1,7 @@
 package com.kinsella.assessment.business.service;
 
 
+import com.kinsella.assessment.business.domain.FuelPolicy;
 import com.kinsella.assessment.business.domain.SegmentedCarResult;
 
 import java.util.Collection;
@@ -12,7 +13,7 @@ public interface CarResultService {
 
     Collection<SegmentedCarResult> sortByCorporateCategoryPrice(Collection<SegmentedCarResult> segmentedCarResults);
 
-    Collection<SegmentedCarResult> removeResultsAboveMedian(Collection<SegmentedCarResult> segmentedCarResults);
+    Collection<SegmentedCarResult> removeResultsAboveMedian(Collection<SegmentedCarResult> segmentedCarResults, FuelPolicy fuelPolicy);
 
     double getMedianPrice(List<SegmentedCarResult> segmentedCarResultList);
 }

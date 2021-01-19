@@ -4,5 +4,5 @@ import com.kinsella.assessment.data.persistence.entity.CarResult;
 
 public interface SegmentedCarResultAssembler {
 
-    SegmentedCarResult assemble(CarResult carResult);
+    SegmentedCarResult assemble(CarResult carResult) throws IllegalArgumentException;
 }

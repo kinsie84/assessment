@@ -17,7 +17,7 @@ public class SegmentedCarResultAssemblerImpl implements SegmentedCarResultAssemb
     }
 
     @Override
-    public SegmentedCarResult assemble(CarResult carResult) {
+    public SegmentedCarResult assemble(CarResult carResult) throws IllegalArgumentException{
 
         String description = carResult.getDescription();
         String supplier = carResult.getSupplierName();
