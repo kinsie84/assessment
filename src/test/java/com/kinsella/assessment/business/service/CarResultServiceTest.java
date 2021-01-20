@@ -1,9 +1,7 @@
 package com.kinsella.assessment.business.service;
 
-import com.kinsella.assessment.business.domain.SegmentedCarResult;
-import com.kinsella.assessment.business.domain.SegmentedCarResultAssembler;
-import com.kinsella.assessment.business.domain.SegmentedCarResultAssemblerImpl;
-import com.kinsella.assessment.data.persistence.entity.CarResult;
+import com.kinsella.assessment.business.domain.*;
+import com.kinsella.assessment.data.dto.CarResult;
 import com.kinsella.assessment.data.repository.CarResultRepository;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,6 +14,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,31 +24,64 @@ public class CarResultServiceTest {
 
     @TestConfiguration
     static class CarResultServiceTestContextConfiguration {
-
-        @Bean
-        public CarResultService carResultService() {
-            return new CarResultServiceImpl();
-        }
+        @MockBean
+        private CarResultRepository carResultRepository;
 
         @Bean
         public SegmentedCarResultAssembler segmentedCarResultAssembler() {
             return new SegmentedCarResultAssemblerImpl();
         }
+        @Bean
+        public CarResultServiceImpl carResultService() {
+            return new CarResultServiceImpl(carResultRepository, segmentedCarResultAssembler());
+        }
+
+        @Bean
+        public CarResultRepository carResultRepository() {
+            return carResultRepository;
+        }
     }
 
     @Autowired
     private SegmentedCarResultAssembler segmentedCarResultAssembler;
-
     @Autowired
     private CarResultService carResultService;
-
-    @MockBean
+    @Autowired
     private CarResultRepository carResultRepository;
 
     @Before
     public void setUp() {
         Mockito.when(carResultRepository.findAll())
-                .thenReturn(null);
+                .thenReturn(getTestList());
+    }
+
+    @Test
+    public void testListIsSortedCorrectly() {
+        List<SegmentedCarResult> expected = new ArrayList<>();
+        expected.add(new SegmentedCarResult("Peugeot 107", "SIXT", "MCMR", 22.50d, FuelPolicy.FULLEMPTY, true, Category.MINI));
+        expected.add(new SegmentedCarResult("Peugeot 107", "AVIS", "MCMR", 30.05d, FuelPolicy.FULLFULL, true, Category.MINI));
+        expected.add(new SegmentedCarResult("Opel Corsa", "SIXT", "EDMN", 29.50d, FuelPolicy.FULLFULL, true, Category.ECONOMY));
+        expected.add(new SegmentedCarResult("Volkswagen Golf", "FIREFLY", "CDMR", 48.00d, FuelPolicy.FULLFULL, true, Category.COMPACT));
+        expected.add(new SegmentedCarResult("Mercedes A Class", "AVIS", "ICAV", 80.00d, FuelPolicy.FULLFULL, true, Category.OTHER));
+        expected.add(new SegmentedCarResult("Volkswagen Up", "DEPLASO", "MDMR", 8.00d, FuelPolicy.FULLEMPTY,true, Category.MINI));
+        expected.add(new SegmentedCarResult("Volkswagen Polo", "DELPASO", "EDMR", 10.00d, FuelPolicy.FULLFULL, true, Category.ECONOMY));
+        expected.add(new SegmentedCarResult("Volkswagen Golf", "GOLDCAR", "CLMR", 18.00d, FuelPolicy.FULLEMPTY, true, Category.COMPACT));
+        expected.add(new SegmentedCarResult("Citroen Berlingo", "GOLDCAR", "CMMV", 28.00d, FuelPolicy.FULLFULL, true, Category.COMPACT));
+        expected.add(new SegmentedCarResult("Ford Galaxy", "RECORD", "FVAR", 65.00d, FuelPolicy.FULLEMPTY, true, Category.OTHER));
+
+        Collection<SegmentedCarResult> carResults = carResultService.getSegmentedCarResults();
+
+        Collection<SegmentedCarResult> actual = carResultService.sortByCorporateCategoryPrice(carResults);
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    public void testFilterListByGroupReturnsCorporateOnly() {
+
+        Collection<SegmentedCarResult> carResults = carResultService.getSegmentedCarResults();
+        Collection<SegmentedCarResult> corporateResults = carResultService.filterListByGroup(carResults, true);
+
+        corporateResults.forEach(carResult -> assertThat(carResult.isCorporate()));
     }
 
     @Test
@@ -115,4 +147,54 @@ public class CarResultServiceTest {
         assertThat(actualMedian).isEqualTo(expectedMedian);
     }
 
+    @Test
+    public void testFilteredMedianReturnsCorrectValuesForCorporateAndNonCorporate() {
+
+        Collection<SegmentedCarResult> carResults = carResultService.getSegmentedCarResults();
+
+        Collection<SegmentedCarResult> corporateResults = carResultService.filterListByGroup(carResults, true);
+        Collection<SegmentedCarResult> nonCorporateResults = carResultService.filterListByGroup(carResults, false);
+
+        double expectedCorporateMedian = 30.05d;
+        double corporateMedian = carResultService.getMedianPrice((List<SegmentedCarResult>)corporateResults);
+        double expectedNonCorporateMedian = 18d;
+        double nonCorporateMedian = carResultService.getMedianPrice((List<SegmentedCarResult>)nonCorporateResults);
+
+        assertThat(corporateMedian).isEqualTo(expectedCorporateMedian);
+        assertThat(nonCorporateMedian).isEqualTo(expectedNonCorporateMedian);
+    }
+
+    @Test
+    public void testListExcludesValuesAboveGroupMedianWithFuelPolicyFULLFULL() {
+
+        List<SegmentedCarResult> expected = new ArrayList<>();
+        expected.add(new SegmentedCarResult("Peugeot 107", "SIXT", "MCMR", 22.50d, FuelPolicy.FULLEMPTY, true, Category.MINI));
+        expected.add(new SegmentedCarResult("Opel Corsa", "SIXT", "EDMN", 29.50d, FuelPolicy.FULLFULL, true, Category.ECONOMY));
+        expected.add(new SegmentedCarResult("Peugeot 107", "AVIS", "MCMR", 30.05d, FuelPolicy.FULLFULL, true, Category.MINI));
+        expected.add(new SegmentedCarResult("Volkswagen Up", "DEPLASO", "MDMR", 8.00d, FuelPolicy.FULLEMPTY,true, Category.MINI));
+        expected.add(new SegmentedCarResult("Volkswagen Polo", "DELPASO", "EDMR", 10.00d, FuelPolicy.FULLFULL, true, Category.ECONOMY));
+        expected.add(new SegmentedCarResult("Volkswagen Golf", "GOLDCAR", "CLMR", 18.00d, FuelPolicy.FULLEMPTY, true, Category.COMPACT));
+        expected.add(new SegmentedCarResult("Ford Galaxy", "RECORD", "FVAR", 65.00d, FuelPolicy.FULLEMPTY, true, Category.OTHER));
+
+        Collection<SegmentedCarResult> carResults = carResultService.getSegmentedCarResults();
+        Collection<SegmentedCarResult> actualResults = carResultService.removeResultsAboveMedian(carResults,FuelPolicy.FULLFULL);
+
+        assertThat(actualResults).isEqualTo(expected);
+    }
+
+
+    private Iterable<CarResult> getTestList() {
+        List<CarResult> carResults = new ArrayList<>();
+        carResults.add(new CarResult("Ford Galaxy", "RECORD", "FVAR", 65.00d, "FULLEMPTY"));
+        carResults.add(new CarResult("Peugeot 107", "AVIS", "MCMR", 30.05d, "FULLFULL"));
+        carResults.add(new CarResult("Citroen Berlingo", "GOLDCAR", "CMMV", 28.00d, "FULLFULL"));
+        carResults.add(new CarResult("Volkswagen Golf", "GOLDCAR", "CLMR", 18.00d, "FULLEMPTY"));
+        carResults.add(new CarResult("Opel Corsa", "SIXT", "EDMN", 29.50d, "FULLFULL"));
+        carResults.add(new CarResult("Mercedes A Class", "AVIS", "ICAV", 80.00d, "FULLFULL"));
+        carResults.add(new CarResult("Volkswagen Polo", "DELPASO", "EDMR", 10.00d, "FULLFULL"));
+        carResults.add(new CarResult("Peugeot 107", "SIXT", "MCMR", 22.50d, "FULLEMPTY"));
+        carResults.add(new CarResult("Volkswagen Up", "DEPLASO", "MDMR", 8.00d, "FULLEMPTY"));
+        carResults.add(new CarResult("Volkswagen Golf", "FIREFLY", "CDMR", 48.00d, "FULLFULL"));
+        return carResults;
+    }
 }

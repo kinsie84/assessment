@@ -3,7 +3,7 @@ package com.kinsella.assessment.business.service;
 import com.kinsella.assessment.business.domain.FuelPolicy;
 import com.kinsella.assessment.business.domain.SegmentedCarResult;
 import com.kinsella.assessment.business.domain.SegmentedCarResultAssembler;
-import com.kinsella.assessment.data.persistence.entity.CarResult;
+import com.kinsella.assessment.data.dto.CarResult;
 import com.kinsella.assessment.data.repository.CarResultRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,15 +18,18 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Service
-public class CarResultServiceImpl implements CarResultService{
+public class CarResultServiceImpl implements CarResultService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CarResultServiceImpl.class);
 
-    @Autowired
-    private CarResultRepository carResultRepository;
+    private final CarResultRepository carResultRepository;
+    private final SegmentedCarResultAssembler segmentedCarResultAssembler;
 
     @Autowired
-    private SegmentedCarResultAssembler segmentedCarResultAssembler;
+    public CarResultServiceImpl(CarResultRepository carResultRepository, SegmentedCarResultAssembler segmentedCarResultAssembler) {
+        this.carResultRepository = carResultRepository;
+        this.segmentedCarResultAssembler = segmentedCarResultAssembler;
+    }
 
     private Collection<CarResult> getAll() {
 
@@ -66,8 +69,8 @@ public class CarResultServiceImpl implements CarResultService{
     @Override
     public Collection<SegmentedCarResult> removeResultsAboveMedian(Collection<SegmentedCarResult> segmentedCarResults, FuelPolicy fuelPolicy) {
 
-        Collection<SegmentedCarResult> corporateList = filterListByGroup( segmentedCarResults, true);
-        Collection<SegmentedCarResult> nonCorporateList = filterListByGroup( segmentedCarResults, false);
+        Collection<SegmentedCarResult> corporateList = filterListByGroup(segmentedCarResults, true);
+        Collection<SegmentedCarResult> nonCorporateList = filterListByGroup(segmentedCarResults, false);
 
         double corporateMedian = getMedianPrice((List<SegmentedCarResult>) corporateList);
         double nonCorporateMedian = getMedianPrice((List<SegmentedCarResult>) nonCorporateList);
@@ -76,6 +79,14 @@ public class CarResultServiceImpl implements CarResultService{
         nonCorporateList.removeIf(c -> c.getFuelPolicy() == fuelPolicy && c.getRentalCost() > nonCorporateMedian);
 
         return Stream.of(corporateList, nonCorporateList).flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    @Override
+    public Collection<SegmentedCarResult> filterListByGroup(Collection<SegmentedCarResult> segmentedCarResults, boolean corporate) {
+
+        return segmentedCarResults.stream()
+                .filter((c) -> c.isCorporate() == corporate)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -93,12 +104,5 @@ public class CarResultServiceImpl implements CarResultService{
         }
 
         return Math.floor(median * 100) / 100;
-    }
-
-    private Collection<SegmentedCarResult> filterListByGroup(Collection<SegmentedCarResult> segmentedCarResults, boolean corporate) {
-
-        return segmentedCarResults.stream()
-                .filter((c) -> c.isCorporate() == corporate)
-                .collect(Collectors.toList());
     }
 }

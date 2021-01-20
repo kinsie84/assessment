@@ -1,6 +1,6 @@
 package com.kinsella.assessment.business.domain;
 
-import com.kinsella.assessment.data.persistence.entity.CarResult;
+import com.kinsella.assessment.data.dto.CarResult;
 
 public interface SegmentedCarResultAssembler {
 

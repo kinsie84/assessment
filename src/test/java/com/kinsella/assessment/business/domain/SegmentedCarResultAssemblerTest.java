@@ -1,12 +1,13 @@
 package com.kinsella.assessment.business.domain;
 
-import com.kinsella.assessment.data.persistence.entity.CarResult;
+import com.kinsella.assessment.data.dto.CarResult;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.junit4.SpringRunner;
+import static org.assertj.core.api.Assertions.assertThat;
 
 @RunWith(SpringRunner.class)
 public class SegmentedCarResultAssemblerTest {
@@ -42,5 +43,32 @@ public class SegmentedCarResultAssemblerTest {
 
         CarResult carResult = new CarResult("Test1","", "AAA", 12.81d,"FULLFULL" );
         segmentedCarResultAssembler.assemble(carResult);
+    }
+
+    @Test
+    public void testCorporateSupplierSetsCorporateFlag() {
+
+        CarResult carResult = new CarResult("Test1","AVIS", "MEC", 12.81d,"FULLFULL" );
+        SegmentedCarResult segmentedCarResult = segmentedCarResultAssembler.assemble(carResult);
+
+        assertThat(segmentedCarResult.isCorporate()).isEqualTo(true);
+    }
+
+    @Test
+    public void testSippCodeBeginningWithMSetsMiniCategory() {
+
+        CarResult carResult = new CarResult("Test1","AVIS", "MEC", 12.81d,"FULLFULL" );
+        SegmentedCarResult segmentedCarResult = segmentedCarResultAssembler.assemble(carResult);
+
+        assertThat(segmentedCarResult.getCategory()).isEqualTo(Category.MINI);
+    }
+
+    @Test
+    public void testSippCodeBeginningWithXSetsOthereCategory() {
+
+        CarResult carResult = new CarResult("Test1","AVIS", "XEC", 12.81d,"FULLFULL" );
+        SegmentedCarResult segmentedCarResult = segmentedCarResultAssembler.assemble(carResult);
+
+        assertThat(segmentedCarResult.getCategory()).isEqualTo(Category.OTHER);
     }
 }

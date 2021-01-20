@@ -3,7 +3,6 @@ package com.kinsella.assessment.presentation;
 import com.kinsella.assessment.business.domain.FuelPolicy;
 import com.kinsella.assessment.business.domain.SegmentedCarResult;
 import com.kinsella.assessment.business.service.CarResultService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -12,8 +11,11 @@ import java.util.Collection;
 @Component
 public class ConsoleInterface implements CommandLineRunner {
 
-    @Autowired
     private CarResultService carResultService;
+
+    public ConsoleInterface(CarResultService carResultService) {
+         this.carResultService = carResultService;
+    }
 
     @Override
     public void run(String... args) {

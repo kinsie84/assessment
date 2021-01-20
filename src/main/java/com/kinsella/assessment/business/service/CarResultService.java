@@ -15,5 +15,7 @@ public interface CarResultService {
 
     Collection<SegmentedCarResult> removeResultsAboveMedian(Collection<SegmentedCarResult> segmentedCarResults, FuelPolicy fuelPolicy);
 
+    Collection<SegmentedCarResult> filterListByGroup(Collection<SegmentedCarResult> segmentedCarResults, boolean corporate);
+
     double getMedianPrice(List<SegmentedCarResult> segmentedCarResultList);
 }
