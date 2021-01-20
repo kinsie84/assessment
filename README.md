@@ -17,6 +17,11 @@ A unique list of CarResults is retrieved via the data source, then the following
 * JRE 1.11.X
 * Maven 3.6.x
 
+## Clone
+Download/Clone the project on to your local machine:
+
+ * git clone https://github.com/kinsie84/assessment.git
+ 
 ## Spring Boot Run
 Navigate to the root directory and run using the following command:
 
