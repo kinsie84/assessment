@@ -13,6 +13,7 @@ public class ConsoleInterface implements CommandLineRunner {
 
     private CarResultService carResultService;
 
+    @Autowired
     public ConsoleInterface(CarResultService carResultService) {
          this.carResultService = carResultService;
     }
