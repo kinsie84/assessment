@@ -27,9 +27,3 @@ Navigate to the root directory and run using the following command:
 
 * mvn spring-boot:run
  
-## Executable Jar
-An executable jar file is available in the "executable" directory.
-
-To run this jar file, navigate to the directory and run the following command:
-
-* java -jar assessment-0.0.1-SNAPSHOT.jar
